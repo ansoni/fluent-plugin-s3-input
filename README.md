@@ -42,14 +42,14 @@ S3 Event Example Intake
 	</filter>
 	
 	# read and emit the json object
-        # this plugin!
+	# this plugin!
 	<match sqs.s3.event>
 	  type s3_input
-          merge_record no
+	  merge_record no
 	  s3_bucket_key s3_bucket
 	  s3_object_key_key s3_object
-          uncompress gzip
-          tag s3.file.contents
+	  uncompress gzip
+	  tag s3.file.contents
 	</filter>
 
 	# Emit each record in the cloudtrail json document as a new event
@@ -67,4 +67,5 @@ S3 Event Example Intake
     remove_keys key1, key2 : keys that we remove after reading the s3 object
     compression_exts gz, zip : extensions that we uncompress.  Allows you to ingest both compressed and uncompressed files
     record_key : if set, the record will be placed in this key 
+    aws_region : region to use.  Default to us-east-1
 

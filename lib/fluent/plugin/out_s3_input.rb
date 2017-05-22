@@ -14,6 +14,7 @@ module Fluent
 
     config_param :aws_key_id, :string, :default => ENV['AWS_ACCESS_KEY_ID'], :secret => true
     config_param :aws_sec_key, :string, :default => ENV['AWS_SECRET_ACCESS_KEY'], :secret => true
+    config_param :aws_region, :string, :default => "us-east-1"
     config_param :s3_bucket_key
     config_param :s3_object_key_key
     config_param :tag
@@ -40,12 +41,14 @@ module Fluent
 
       if @aws_key_id and @aws_sec_key
         @s3 = Aws::S3::Client.new(
-          region: "us-east-1",
+          region: @aws_region,
           access_key_id: @aws_key_id,
           secret_access_key: @aws_sec_key,
         )
       else
-        @s3 = Aws::S3::Client.new()
+        @s3 = Aws::S3::Client.new(
+          region: @aws_region,
+        )
       end
     end
     
