@@ -45,6 +45,7 @@ S3 Event Example Intake
         # this plugin!
 	<match sqs.s3.event>
 	  type s3_input
+          merge_record no
 	  s3_bucket_key s3_bucket
 	  s3_object_key_key s3_object
           uncompress gzip
@@ -57,3 +58,13 @@ S3 Event Example Intake
 	  split_key Records
 	  tag cloudtrail
 	</match>
+# params
+    tag my.new.tag : tag name to emit new record as
+    uncompress gzip : decompression algorithm (only gzip:-/)
+    s3_bucket_key my_s3_bucket : The name of your S3 bucket
+    s3_object_key_key /some/cool/object : The path to your S3 object
+    merge_record  yes|no : Do we merge or replace the input record
+    remove_keys key1, key2 : keys that we remove after reading the s3 object
+    compression_exts gz, zip : extensions that we uncompress.  Allows you to ingest both compressed and uncompressed files
+    record_key : if set, the record will be placed in this key 
+

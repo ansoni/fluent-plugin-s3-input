@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-s3-input"
-  spec.version       = "0.0.1"
+  spec.version       = "0.0.11"
   spec.authors       = ["Anthony Johnson"]
   spec.email         = ["ansoni@gmail.com"]
   spec.description   = %q{Fluentd plugin to read a file from S3 and emit it}
@@ -21,4 +21,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency     "fluentd"
   spec.add_runtime_dependency     "aws-sdk"
   spec.add_runtime_dependency     "oj"
+  spec.add_runtime_dependency     "rubyzip"
 end
