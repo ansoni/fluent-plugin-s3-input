@@ -94,7 +94,9 @@ module Fluent
             begin
               s3_record = Oj.load(json_data)
             rescue Oj::ParseError=>e
-              puts "Error loading #{json_data} - #{e.to_s}"
+              puts "Failure parsing: "
+              puts json_data.to_s
+              puts "Error: #{e.to_s}"
             end
           elsif @format == 'csv'
             data = input.read

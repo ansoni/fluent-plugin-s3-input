@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fluent-plugin-s3-input (0.0.13)
+    fluent-plugin-s3-input (0.0.14)
       aws-sdk
       fluentd
       oj
@@ -10,13 +10,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aws-sdk (2.9.24)
-      aws-sdk-resources (= 2.9.24)
-    aws-sdk-core (2.9.24)
+    aws-sdk (2.9.25)
+      aws-sdk-resources (= 2.9.25)
+    aws-sdk-core (2.9.25)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.9.24)
-      aws-sdk-core (= 2.9.24)
+    aws-sdk-resources (2.9.25)
+      aws-sdk-core (= 2.9.25)
     aws-sigv4 (1.0.0)
     cool.io (1.5.0)
     fluentd (0.14.16)
