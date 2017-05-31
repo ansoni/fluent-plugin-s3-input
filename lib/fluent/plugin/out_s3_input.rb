@@ -51,14 +51,14 @@ module Fluent
         )
       end
     end
-    
+
     # Allow JSON data in a couple of formats
     # {} single event
     # [{},{}] array of events
     # {}\n{}\n{} concatenated events (flume)
     def normalize_json(json)
       if json[0] != "["
-        json=json.gsub /}\n{/,"},{" 
+        json=json.gsub /}\n{/,"},{"
         json="[#{json}]"
       end
       json
@@ -71,14 +71,13 @@ module Fluent
           s3_bucket = record[s3_bucket_key]
           s3_key = record[s3_object_key_key]
           s3_key_ext = s3_key.split(".")[-1]
-          resp = s3.get_object(bucket: s3_bucket, key: s3_key) 
+          resp = s3.get_object(bucket: s3_bucket, key: s3_key)
 
           if @gzip_exts.include?(s3_key_ext)
             input = Zlib::GzipReader.new(resp.body)
           elsif @zip_exts.include?(s3_key_ext)
             io = Zip::InputStream.new(resp.body)
             input = io.get_next_entry
-            #input = Zip::File.open(resp.body).entries.first.get_input_stream
           else
             input = resp.body
           end
@@ -87,20 +86,19 @@ module Fluent
           if @merge_record
             new_record = {}.merge(record)
           end
-   
-          s3_record = {} 
+
+          s3_record = {}
           if @format == 'json'
             json_data=normalize_json input.read
             begin
               s3_record = Oj.load(json_data)
             rescue Oj::ParseError=>e
-              puts "Failure parsing: "
-              puts json_data.to_s
-              puts "Error: #{e.to_s}"
+              $log.error e.to_s
+              $log.error json_data
             end
           elsif @format == 'csv'
             data = input.read
-            File.open("/tmp/s3debug", 'w') { |file| file.write(data) } 
+            File.open("/tmp/s3debug", 'w') { |file| file.write(data) }
             s3_record=CSV.parse(data).to_json
           else
             raise "Unsupported format - #{@format}"
@@ -108,27 +106,28 @@ module Fluent
 
           # parse the time from the record
           @time_keys.each do |time_key|
-            puts "Look for #{time_key} in #{new_record}"
             if s3_record.include? time_key
-              puts "Reset time for #{time_key}"
-              time=Time.strptime(new_record[time_key], @time_format).to_i
-              puts "Setting time to #{time}"
+              time=Time.strptime(new_record[time_key], @time_format).to_f
+              $log.debug "Reset time for #{time_key}, Setting time to #{time}"
               break
             end
           end
 
-          if @record_key == nil  
-            tmp_record=s3_record.merge(new_record)
-            new_record=tmp_record
-          else
-            new_record[record_key]=s3_record
-          end
-        
-          @remove_keys.each do |key_to_remove|
-            new_record.delete(key_to_remove)
-          end
+          s3_record.each do |a_record|
 
-          router.emit(@tag, time, new_record)
+            if @record_key == nil
+              tmp_record=a_record.merge(new_record)
+              new_record=tmp_record
+            else
+              new_record[record_key]=a_record
+            end
+
+            @remove_keys.each do |key_to_remove|
+              new_record.delete(key_to_remove)
+            end
+            $log.debug "Emit - #{new_record}"
+            router.emit(@tag, time, new_record)
+          end
         }
         chain.next
       rescue StandardError => e

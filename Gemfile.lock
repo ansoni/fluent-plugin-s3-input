@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fluent-plugin-s3-input (0.0.14)
+    fluent-plugin-s3-input (0.0.15)
       aws-sdk
       fluentd
       oj
