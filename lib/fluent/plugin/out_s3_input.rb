@@ -91,7 +91,11 @@ module Fluent
           s3_record = {} 
           if @format == 'json'
             json_data=normalize_json input.read
-            s3_record = Oj.load(json_data)
+            begin
+              s3_record = Oj.load(json_data)
+            rescue Oj::ParseError=>e
+              puts "Error loading #{json_data} - #{e.to_s}"
+            end
           elsif @format == 'csv'
             data = input.read
             File.open("/tmp/s3debug", 'w') { |file| file.write(data) } 
