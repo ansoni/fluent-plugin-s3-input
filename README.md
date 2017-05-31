@@ -43,6 +43,8 @@ S3 Event Example Intake
 	
 	# read and emit the json object
 	# this plugin!
+        # if the document is an object, it will be emitted.
+        # if the document is an array, then each element of the array will be emitted
 	<match sqs.s3.event>
 	  type s3_input
 	  merge_record no
@@ -52,12 +54,6 @@ S3 Event Example Intake
 	  tag s3.file.contents
 	</filter>
 
-	# Emit each record in the cloudtrail json document as a new event
-	<match s3.file.contents>
-	  type record_splitter
-	  split_key Records
-	  tag cloudtrail
-	</match>
 # params
     tag my.new.tag : tag name to emit new record as
     uncompress gzip : decompression algorithm (only gzip:-/)
