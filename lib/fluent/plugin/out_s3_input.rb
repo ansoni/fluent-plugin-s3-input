@@ -82,9 +82,9 @@ module Fluent
             input = resp.body
           end
 
-          new_record = {}
+          default_record = {}
           if @merge_record
-            new_record = {}.merge(record)
+            default_record = {}.merge(record)
           end
 
           s3_record = {}
@@ -104,19 +104,20 @@ module Fluent
             raise "Unsupported format - #{@format}"
           end
 
-          # parse the time from the record
-          @time_keys.each do |time_key|
-            if s3_record.include? time_key
-              time=Time.strptime(new_record[time_key], @time_format).to_f
-              $log.debug "Reset time for #{time_key}, Setting time to #{time}"
-              break
-            end
-          end
 
           s3_record.each do |a_record|
 
+            # parse the time from the record
+            @time_keys.each do |time_key|
+              if s3_record.include? time_key
+                time=Time.strptime(a_record[time_key], @time_format).to_f
+                $log.debug "Reset time for #{time_key}, Setting time to #{time}"
+                break
+              end
+            end
+
             if @record_key == nil
-              tmp_record=a_record.merge(new_record)
+              tmp_record=a_record.merge(default_record)
               new_record=tmp_record
             else
               new_record[record_key]=a_record
